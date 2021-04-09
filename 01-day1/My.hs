@@ -57,9 +57,34 @@ myLength [] = 0
 myLength [x] = 1
 myLength (x:xs) = 1 + myLength xs
 
--- myNth :: [a] -> Int -> a
--- myNth (x:xs) n
---     | myIsNeg n = error "index cannot be a negative number" 
---     | myLength(x:xs) < n = error "index out of range"
---     | myNth
+myNth :: [a] -> Int -> a
+myNth [] n = error "empty list" 
+myNth (x:xs) n
+    | myIsNeg n = error "index cannot be a negative number" 
+    | myLength (x:xs) < n = error "index out of range"
+    | n == 0 = x
+    | otherwise = myNth xs (n-1)
+
+myTake :: Int -> [a] -> [a]
+myTake n [] = error "empty list"
+myTake n (x:xs)
+    | myIsNeg n = error "index cannot be a negative number"
+    | myLength (x:xs) < n = (x:xs) 
+    | n == 1 = [x]
+    | otherwise = x : myTake (n - 1) xs
+
+myDrop :: Int -> [a] -> [a]
+myDrop n [] = error "empty list"
+myDrop n (x:xs)
+    | myIsNeg n = error "index cannot be a negative number"
+    | myLength (x:xs) < n = []
+    | n == 1 = xs
+    | otherwise = myDrop (n - 1) xs
+
+-- myAppend :: [a] -> [a] -> [a]
+-- myAppend [] [a] = [a]
+-- myAppend [a] [] = [a]
+-- myAppend [] [] = []
+-- myAppend (x:xs) (y:ys) = x
+
 

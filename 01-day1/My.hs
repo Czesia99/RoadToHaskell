@@ -138,26 +138,39 @@ myUnzip :: [(a, b)] -> ([a], [b])
 myUnzip [] = ([],[])
 myUnzip ((a,b):xs) = (a:(myFst rest), b:(mySnd rest))
     where rest = myUnzip xs
--- A function which takes a list of tuples, and return a tuple of lists.
+-- function which takes a list of tuples, and return a tuple of lists.
 
 myMap :: (a -> b) -> [a] -> [b]
 myMap _ [] = []
 myMap f (x:xs) = f x : myMap f xs
--- A function which takes a function and a list, and apply this function to every element of the list.
+-- function which takes a function and a list, and apply this function to every element of the list.
 
 myFilter :: (a -> Bool) -> [a] -> [a]
 myFilter _ [] = []
 myFilter f (x:xs) 
     | f x = x : myFilter f xs
     | otherwise = myFilter f xs
--- A function which takes a predicate (a function returning a boolean value) and a list, and returns a list of all
+-- function which takes a predicate (a function returning a boolean value) and a list, and returns a list of all
 -- the elements for which the predicate has returned True.
 
 
--- myFoldl :: ( b -> a -> b ) -> b -> [ a ] -> b
--- A function which takes a function, a starting value and a list as argument.
+myFoldl :: (b -> a -> b) -> b -> [a] -> b
+myFoldl f a [] = a
+myFoldl f a (x:xs) = myFoldl f (f a x) xs
+-- function which takes a function, a starting value and a list as argument.
 -- It takes the second argument and the first item of the list and applies the function to them,
 -- then feeds the function with this result and the second argument and so on
+
+myFoldr :: (a -> b -> b) -> b -> [a] -> b
+myFoldr f a [] = a
+myFoldr f a (x:xs) = f x (myFoldr f a xs)
+-- Like myFoldl, but from right to left.
+
+
+-- mySpan :: (a -> Bool) -> [a] -> ([a], [a])
+
+-- function which takes a predicate and a list as argument, and returns a tuple of lists, with in the first list the
+-- elements for which the predicate returns true, and in the second list the other elements.
 
 -- forbidden :: if-then-else
 -- authorized :: let-in where case of

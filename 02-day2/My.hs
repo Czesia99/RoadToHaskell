@@ -5,6 +5,8 @@
 -- basic haskell functions
 --
 
+module My where
+
 mySucc :: Int -> Int
 mySucc a = a + 1
 -- function which takes one Int as argument and returns its successor.
@@ -87,7 +89,7 @@ myTake :: Int -> [a] -> [a]
 myTake n [] = error "empty list"
 myTake n (x:xs)
     | myIsNeg n = error "index cannot be a negative number"
-    | myLength (x:xs) < n = (x:xs)
+    | myLength (x:xs) < n = (x:xs) 
     | n == 1 = [x]
     | otherwise = x : myTake (n - 1) xs
 -- A function which takes an Int (N) and a list and returns a list with the Nth first elements of the list.

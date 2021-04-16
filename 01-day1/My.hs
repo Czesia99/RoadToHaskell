@@ -173,18 +173,17 @@ myFoldr f a [] = a
 myFoldr f a (x:xs) = f x (myFoldr f a xs)
 -- Like myFoldl, but from right to left.
 
-
 mySpan :: (a -> Bool) -> [a] -> ([a], [a])
 mySpan _ [] = ([],[])
 mySpan f x = (myFilter f x, myFilterFalse f x)
 -- function which takes a predicate and a list as argument, and returns a tuple of lists, with in the first list the
 -- elements for which the predicate returns true, and in the second list the other elements.
 
--- myQuickSort :: (a -> a -> Bool) -> [a] -> [a]
--- myQuickSort _ [] = []
--- myQuickSort
+myQuickSort :: (a -> a -> Bool) -> [a] -> [a]
+myQuickSort _ [] = []
+myQuickSort f (x:xs) = (myAppend (myAppend false [x]) true)
+    where 
+        true = myQuickSort f (myFilter (f x) xs)
+        false = myQuickSort f (myFilterFalse (f x) xs)
 -- A function which takes a predicate and a list as arguments,
 -- and returns the list sorted according to the predicate.
-
--- forbidden :: if-then-else
--- authorized :: let-in where case of

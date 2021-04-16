@@ -32,6 +32,9 @@ safeSucc' Nothing = Nothing
 safeSucc' a = fmap (+1) a
 -- safeSucc using fmap
 
--- safeSucc'' :: Maybe Int -> Maybe Int
--- safeSucc'' Nothing = Nothing
--- safeSucc'' >>= (a + 1)
+safeSucc'' :: Maybe Int -> Maybe Int
+safeSucc'' n = Just n >>= safeSucc
+-- safeSucc using >>= operator
+
+myLookup :: Eq a => a -> [(a, b)] -> Maybe b
+myLookup = undefined

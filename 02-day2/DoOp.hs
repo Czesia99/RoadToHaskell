@@ -6,6 +6,7 @@
 --
 
 import My
+import Text.Read
 
 myElem :: Eq a => a -> [a] -> Bool
 myElem _ [] = False
@@ -18,7 +19,7 @@ safeDiv a b = Just (a `div` b)
 safeNth :: [a] -> Int -> Maybe a
 safeNth [] _ = Nothing
 safeNth (x:xs) n
-    | myIsNeg n = Nothing 
+    | myIsNeg n = Nothing
     | length (x:xs) < n = Nothing
     | n == 0 = Just x
     | otherwise = safeNth xs (n-1)
@@ -37,4 +38,51 @@ safeSucc'' n = Just n >>= safeSucc
 -- safeSucc using >>= operator
 
 myLookup :: Eq a => a -> [(a, b)] -> Maybe b
-myLookup = undefined
+myLookup _ [] = Nothing
+myLookup k ((a,b):xs)
+    | k == a = Just b
+    | otherwise = myLookup k xs
+
+maybeDo :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+maybeDo f _ Nothing = Nothing
+maybeDo f Nothing _ = Nothing 
+maybeDo f (Just a) (Just b) = Just (f a b)
+
+-- maybeDo' :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+-- maybeDo' f a b = (Just a) >>= maybeDo
+
+-- maybeDo'' :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+-- maybeDo'' f a b =
+--     do  a <- Just a
+--         b <- Just b
+--         return (f a b)
+
+readInt :: [Char] -> Maybe Int
+readInt = readMaybe
+
+getLineLength :: IO Int
+getLineLength = do length <$> getLine
+
+-- getLineLength :: IO Int
+-- getLineLength = 
+--     do 
+--     line <- getLine
+--     return (length line)
+
+printAndGetLength :: String -> IO Int
+printAndGetLength a = do
+    putStrLn a
+    return (length a)
+
+
+-- printBoxLine :: Int -> IO ()
+-- printBoxLine a = do
+--     putStr "+"
+--     if a > 2 then
+--         iterate putStr "-" !! a - 2
+--         putStrLn "+"
+
+-- printBox :: Int -> IO ()
+-- printBox a
+--     | a <= 0 = return Nothing
+--     | otherwise = printBoxLine a

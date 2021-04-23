@@ -142,6 +142,18 @@ myUnzip ((a,b):xs) = (a:(myFst rest), b:(mySnd rest))
     where rest = myUnzip xs
 -- function which takes a list of tuples, and return a tuple of lists.
 
+myUnzipFst :: [(a, b)] -> [a]
+myUnzipFst [] = []
+myUnzipFst ((a,b):xs) = a:(myFst rest)
+    where rest = myUnzip xs
+-- function which takes a list of tuples, and return the first list.
+
+myUnzipSnd :: [(a, b)] -> [b]
+myUnzipSnd [] = []
+myUnzipSnd ((a,b):xs) = b:(mySnd rest)
+    where rest = myUnzip xs
+-- function which takes a list of tuples, and return the second list.
+
 myMap :: (a -> b) -> [a] -> [b]
 myMap _ [] = []
 myMap f (x:xs) = f x : myMap f xs

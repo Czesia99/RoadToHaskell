@@ -76,9 +76,9 @@ myLength (x:xs) = 1 + myLength xs
 -- elements in the list.
 
 myNth :: [a] -> Int -> a
-myNth [] n = error "empty list" 
+myNth [] n = error "empty list"
 myNth (x:xs) n
-    | myIsNeg n = error "index cannot be a negative number" 
+    | myIsNeg n = error "index cannot be a negative number"
     | myLength (x:xs) < n = error "index out of range"
     | n == 0 = x
     | otherwise = myNth xs (n-1)
@@ -89,7 +89,7 @@ myTake :: Int -> [a] -> [a]
 myTake n [] = error "empty list"
 myTake n (x:xs)
     | myIsNeg n = error "index cannot be a negative number"
-    | myLength (x:xs) < n = (x:xs) 
+    | myLength (x:xs) < n = x:xs
     | n == 1 = [x]
     | otherwise = x : myTake (n - 1) xs
 -- A function which takes an Int (N) and a list and returns a list with the Nth first elements of the list.
@@ -113,13 +113,13 @@ myAppend (x:xs) y = x : myAppend xs y
 myReverse :: [a] -> [a]
 myReverse [] = []
 myReverse [x] = [x]
-myReverse (x:xs) = myTail (x:xs) : (myReverse (myTake (myLength (x:xs) - 1) (x:xs)))
+myReverse (x:xs) = myTail (x:xs) : myReverse (myTake (myLength (x:xs) - 1) (x:xs))
 -- function which takes a list and returns a list with all its elements in reverse order.
 
 myInit :: [a] -> [a]
 myInit [] = error "empty list"
 myInit [x] = []
-myInit (x:xs) = (myTake (myLength (x:xs) - 1) (x:xs))
+myInit (x:xs) = myTake (myLength (x:xs) - 1) (x:xs)
 -- function which takes a list and returns a list with all its elements except the last one,
 -- or an error if the list is empty.
 
@@ -138,19 +138,19 @@ myZip (x:xs) (y:ys) = (x,y) : myZip xs ys
 
 myUnzip :: [(a, b)] -> ([a], [b])
 myUnzip [] = ([],[])
-myUnzip ((a,b):xs) = (a:(myFst rest), b:(mySnd rest))
+myUnzip ((a,b):xs) = (a:myFst rest, b:mySnd rest)
     where rest = myUnzip xs
 -- function which takes a list of tuples, and return a tuple of lists.
 
 myUnzipFst :: [(a, b)] -> [a]
 myUnzipFst [] = []
-myUnzipFst ((a,b):xs) = a:(myFst rest)
+myUnzipFst ((a,b):xs) = a:myFst rest
     where rest = myUnzip xs
 -- function which takes a list of tuples, and return the first list.
 
 myUnzipSnd :: [(a, b)] -> [b]
 myUnzipSnd [] = []
-myUnzipSnd ((a,b):xs) = b:(mySnd rest)
+myUnzipSnd ((a,b):xs) = b:mySnd rest
     where rest = myUnzip xs
 -- function which takes a list of tuples, and return the second list.
 
@@ -161,7 +161,7 @@ myMap f (x:xs) = f x : myMap f xs
 
 myFilter :: (a -> Bool) -> [a] -> [a]
 myFilter _ [] = []
-myFilter f (x:xs) 
+myFilter f (x:xs)
     | f x = x : myFilter f xs
     | otherwise = myFilter f xs
 -- function which takes a predicate (a function returning a boolean value) and a list,
@@ -169,7 +169,7 @@ myFilter f (x:xs)
 
 myFilterFalse :: (a -> Bool) -> [a] -> [a]
 myFilterFalse _ [] = []
-myFilterFalse f (x:xs) 
+myFilterFalse f (x:xs)
     | f x = myFilterFalse f xs
     | otherwise =  x : myFilterFalse f xs
 -- function which takes a predicate (a function returning a boolean value) and a list,
@@ -183,8 +183,7 @@ myFoldl f a (x:xs) = myFoldl f (f a x) xs
 -- then feeds the function with this result and the second argument and so on
 
 myFoldr :: (a -> b -> b) -> b -> [a] -> b
-myFoldr f a [] = a
-myFoldr f a (x:xs) = f x (myFoldr f a xs)
+myFoldr = foldr
 -- Like myFoldl, but from right to left.
 
 mySpan :: (a -> Bool) -> [a] -> ([a], [a])
@@ -195,8 +194,8 @@ mySpan f x = (myFilter f x, myFilterFalse f x)
 
 myQuickSort :: (a -> a -> Bool) -> [a] -> [a]
 myQuickSort _ [] = []
-myQuickSort f (x:xs) = (myAppend (myAppend false [x]) true)
-    where 
+myQuickSort f (x:xs) = myAppend (myAppend false [x]) true
+    where
         true = myQuickSort f (myFilter (f x) xs)
         false = myQuickSort f (myFilterFalse (f x) xs)
 -- A function which takes a predicate and a list as arguments,

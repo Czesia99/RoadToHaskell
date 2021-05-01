@@ -7,6 +7,7 @@
 
 import My
 import Text.Read
+import Control.Monad
 
 myElem :: Eq a => a -> [a] -> Bool
 myElem _ [] = False
@@ -45,7 +46,7 @@ myLookup k ((a,b):xs)
 
 maybeDo :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
 maybeDo f _ Nothing = Nothing
-maybeDo f Nothing _ = Nothing 
+maybeDo f Nothing _ = Nothing
 maybeDo f (Just a) (Just b) = Just (f a b)
 
 -- maybeDo' :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
@@ -61,28 +62,29 @@ readInt :: [Char] -> Maybe Int
 readInt = readMaybe
 
 getLineLength :: IO Int
-getLineLength = do length <$> getLine
-
--- getLineLength :: IO Int
--- getLineLength = 
---     do 
---     line <- getLine
---     return (length line)
+getLineLength = length <$> getLine
 
 printAndGetLength :: String -> IO Int
 printAndGetLength a = do
     putStrLn a
     return (length a)
 
+printBox :: Int -> IO ()
+printBox n
+    | n <= 0 = return ()
+    | otherwise = do
+        printBoxEdge
+        printBoxLines n
+        printBoxEdge
+        where
+            printBoxEdge = putStrLn ("+" ++ replicate (n * 2 - 2) '-' ++ "+")
+            printBoxLines n = replicateM_ (n-2) $ putStrLn ("|" ++ replicate (n * 2 - 2) ' ' ++ "|")
 
--- printBoxLine :: Int -> IO ()
--- printBoxLine a = do
---     putStr "+"
---     if a > 2 then
---         iterate putStr "-" !! a - 2
---         putStrLn "+"
+concatLines :: Int -> IO String
+concatLines n
+    | n <= 0 = return ""
+    | otherwise = fmap concat (replicateM n getLine)
 
--- printBox :: Int -> IO ()
--- printBox a
---     | a <= 0 = return Nothing
---     | otherwise = printBoxLine a
+
+getInt :: IO (Maybe Int)
+getInt = readMaybe <$> getLine

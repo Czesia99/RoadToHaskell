@@ -109,3 +109,5 @@ main = do
         ["-h"] -> usage where usage = putStrLn "usage : ./doop Int (either + - * / or %) Int \n IF YOU USE * DON'T FORGET QUOTES\n"
         [] -> return ()
         [_] -> return ()
+
+-- (づ◔v◔)づ

@@ -9,3 +9,6 @@
 - [Day01](./01-day1)
     - Implement from scratch basic functions which are in the Haskell's standard library.
     Most of haskell's advanced tools are forbidden.
+- [Day02](./02-day2)
+    - Handle errors in a more elegant way than with the error function, manage side effects (input and outputs).
+    Build an executable with Haskell

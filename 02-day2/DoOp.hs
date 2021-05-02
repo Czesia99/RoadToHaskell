@@ -109,17 +109,3 @@ main = do
         ["-h"] -> usage where usage = putStrLn "usage : ./doop Int (either + - * / or %) Int \n IF YOU USE * DON'T FORGET QUOTES\n"
         [] -> return ()
         [_] -> return ()
-
-
--- main :: IO ()
--- main = getArgs >>= parse >>= putStr . doop
-
--- doop  = maybeDo 
-
--- parse ["-h"] = usage   >> exit
--- parse []     = getContents
--- parse a b c = print $ a (b) c
-
--- usage   = putStrLn "Usage: doop Int operator Int"
--- exit    = exitSuccess
--- die     = exitWith (ExitFailure 84)

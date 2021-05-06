@@ -1,4 +1,8 @@
-Haskell Guide list
-
+haskell:
 http://learnyouahaskell.com/chapters
 https://www.seas.upenn.edu/~cis194/spring13/lectures.html
+
+wolfram:
+https://en.wikipedia.org/wiki/Elementary_cellular_automaton
+https://www.youtube.com/watch?v=W1zKu3fDQR8
+https://mathworld.wolfram.com/ElementaryCellularAutomaton.html

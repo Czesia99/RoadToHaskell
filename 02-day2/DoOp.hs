@@ -52,15 +52,6 @@ maybeDo f _ Nothing = Nothing
 maybeDo f Nothing _ = Nothing 
 maybeDo f (Just a) (Just b) = Just (f a b)
 
--- maybeDo' :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
--- maybeDo' f a b = (Just a) >>= maybeDo
-
--- maybeDo'' :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
--- maybeDo'' f a b =
---     do  a <- Just a
---         b <- Just b
---         return (f a b)
-
 readInt :: [Char] -> Maybe Int
 readInt = readMaybe
 

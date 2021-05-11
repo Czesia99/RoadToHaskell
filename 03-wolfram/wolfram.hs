@@ -83,12 +83,6 @@ getOptions args = [
     ]
 
 ------ real stuff ------
--- toBin :: Int -> [Int]
--- toBin 0 = [0]
--- toBin 1 = [1]
--- toBin n
---     | n `mod` 2 == 0 = toBin (n `div` 2) ++ [0]
---     | otherwise = toBin (n `div` 2) ++ [1]
 
 toBinary :: Int -> [Int]
 toBinary i = toBin 8 [] i where

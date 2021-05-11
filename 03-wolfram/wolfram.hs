@@ -11,7 +11,12 @@ import System.Environment
 import System.Exit
 
 
+type Cell = Bool
+type CellLine = [Cell]
+type Rule = Cell -> Cell -> Cell -> Cell
+
 ------ print functions ------
+
 printErrAndReturn :: String -> Int -> IO ()
 printErrAndReturn err i = do
     putStrLn err
@@ -50,12 +55,20 @@ checkFlagValue v
 
 checkOptions :: [String] -> Bool
 checkOptions [] = True
+checkOptions [x] = checkFlagValue x
 checkOptions (x:y:xs)
     | checkFlagValidity x && checkFlagValue y = checkOptions xs
     | otherwise = False
 
+defaultFlagValue :: String -> Int
+defaultFlagValue f
+    | f == "--start" = 0
+    | f == "--lines" = -1
+    | f == "--window" = 80
+    | f == "--move" = 0
+
 getFlagValue :: [(String, Int)] -> String -> Int
-getFlagValue [] _ = 0
+getFlagValue [] f = defaultFlagValue f
 getFlagValue ((x, y): xs) flag
     | x == flag = y
     | otherwise = getFlagValue xs flag
@@ -69,6 +82,21 @@ getOptions args = [
     getFlagValue args "--move"
     ]
 
+------ real stuff ------
+-- toBin :: Int -> [Int]
+-- toBin 0 = [0]
+-- toBin 1 = [1]
+-- toBin n
+--     | n `mod` 2 == 0 = toBin (n `div` 2) ++ [0]
+--     | otherwise = toBin (n `div` 2) ++ [1]
+
+toBinary :: Int -> [Int]
+toBinary i = toBin 8 [] i where
+    toBin 0 binary _ = binary
+    toBin n binary i = toBin (n - 1) (rest:binary) quotient where
+        quotient = fst (i `divMod` 2)
+        rest = snd (i `divMod` 2)
+
 wolfram :: [Int] -> IO ()
 wolfram [] = return ()
 wolfram [a] = return ()
@@ -79,11 +107,16 @@ wolfram [rule, start, lines, window, move] = do
     print lines
     print window
     print move
+    putStrLn "--- rule converted in bin ------"
+    mapM_ print (toBinary rule)
 
 main :: IO ()
 main = do
     args <- getArgs
     mapM_ putStrLn args
     case args of
-        [] -> printUsage >> printErrAndReturn "Invalid number of arguments" 84
-        a -> if checkOptions args then wolfram (getOptions (makeTupleArgs args)) else printUsage >> printErrAndReturn "Invalid arguments" 84
+        [] -> printUsage >> invalidArguments
+        a -> if checkOptions args then doWolfram args  else printUsage >> invalidArguments
+        where
+            doWolfram args = wolfram (getOptions (makeTupleArgs args))
+            invalidArguments = printErrAndReturn "Invalid arguments" 84

@@ -10,11 +10,6 @@ import Data.Maybe
 import System.Environment
 import System.Exit
 
-
-type Cell = Bool
-type CellLine = [Cell]
-type Rule = Cell -> Cell -> Cell -> Cell
-
 ------ print functions ------
 
 printErrAndReturn :: String -> Int -> IO ()
@@ -84,6 +79,11 @@ getOptions args = [
 
 ------ real stuff ------
 
+type Cell = Bool
+type CellLine = [Cell]
+type CellNewState = Cell -> Cell -> Cell -> Cell
+type Rule = [(Int, Int)]
+
 toBinary :: Int -> [Int]
 toBinary i = toBin 8 [] i where
     toBin 0 binary _ = binary
@@ -91,10 +91,38 @@ toBinary i = toBin 8 [] i where
         quotient = fst (i `divMod` 2)
         rest = snd (i `divMod` 2)
 
+defRule :: [Int] -> Rule
+defRule binary = [
+    (111, head binary),
+    (110, binary!!1),
+    (101, binary!!2),
+    (100, binary!!3),
+    (011, binary!!4),
+    (010, binary!!5),
+    (001, binary!!6),
+    (000, binary!!7)
+    ]
+
+applyRule :: Rule -> CellNewState
+applyRule r cl cm cr = undefined
+
+evolution :: Rule -> CellLine -> CellLine
+evolution r (x:y:z:xs) = undefined
+
+displayCellLine :: CellLine -> IO ()
+displayCellLine [] = putStr "\n"
+displayCellLine (x:xs)
+    | x = putStr "*" >> displayCellLine xs
+    | otherwise = putStr "-" >> displayCellLine xs
+
+firstCellLine :: Int -> CellLine
+firstCellLine w = replicate ((w `div` 2)) False ++ True : replicate ((w `div` 2) - 1) False
+
 wolfram :: [Int] -> IO ()
 wolfram [] = return ()
 wolfram [a] = return ()
 wolfram [rule, start, lines, window, move] = do
+    -- debug --
     putStrLn "------ in wolfram ------"
     print rule
     print start
@@ -103,6 +131,9 @@ wolfram [rule, start, lines, window, move] = do
     print move
     putStrLn "--- rule converted in bin ------"
     mapM_ print (toBinary rule)
+    -- debug --
+    displayCellLine (firstCellLine window)
+
 
 main :: IO ()
 main = do

@@ -81,7 +81,7 @@ getOptions args = [
 
 type Cell = Bool
 type CellLine = [Cell]
-type CellNeighborhood = Cell -> Cell -> Cell -> Int
+type CellNeighborhood = Int
 type CellNewState = Cell -> Cell -> Cell -> Cell
 type Rule = [(Int, Int)]
 
@@ -104,15 +104,25 @@ defRule binary = [
     (000, binary!!7)
     ]
 
-defNeighborhood :: CellNeighborhood
+defNeighborhood :: Cell -> Cell -> Cell -> CellNeighborhood
 defNeighborhood cl cm cr = addDigit (addDigit (fromEnum cl) (fromEnum cm)) (fromEnum cr)
-    where addDigit n d = 10*n + d
+    where addDigit n d = 10 * n + d
 
--- applyRule :: Rule -> CellNewState
--- applyRule r cl cm cr = 
+compareRule:: Rule -> CellNeighborhood -> Int
+compareRule [] cn = 0
+compareRule ((a,b):xs) cn 
+    | cn == a = b
+    | otherwise = compareRule xs cn
+ 
+applyRule :: Rule -> CellNewState
+applyRule r cl cm cr
+    | compareRule r (defNeighborhood cl cm cr) == 1 = True
+    | otherwise = False
 
-evolution :: Rule -> CellLine -> CellLine
-evolution r (x:y:z:xs) = undefined
+-- evolution :: Rule -> CellLine -> CellLine
+-- evolution  _ (x,y) =
+-- evolution r (x:y:z:xs) = newCellLine (evolution r y:z:xs) : []
+--     where newCellLine arr = applyRule r x y z : arr
 
 displayCellLine :: CellLine -> IO ()
 displayCellLine [] = putStr "\n"

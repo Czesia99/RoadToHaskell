@@ -81,6 +81,7 @@ getOptions args = [
 
 type Cell = Bool
 type CellLine = [Cell]
+type CellNeighborhood = Cell -> Cell -> Cell -> Int
 type CellNewState = Cell -> Cell -> Cell -> Cell
 type Rule = [(Int, Int)]
 
@@ -103,8 +104,12 @@ defRule binary = [
     (000, binary!!7)
     ]
 
-applyRule :: Rule -> CellNewState
-applyRule r cl cm cr = undefined
+defNeighborhood :: CellNeighborhood
+defNeighborhood cl cm cr = addDigit (addDigit (fromEnum cl) (fromEnum cm)) (fromEnum cr)
+    where addDigit n d = 10*n + d
+
+-- applyRule :: Rule -> CellNewState
+-- applyRule r cl cm cr = 
 
 evolution :: Rule -> CellLine -> CellLine
 evolution r (x:y:z:xs) = undefined
@@ -115,8 +120,13 @@ displayCellLine (x:xs)
     | x = putStr "*" >> displayCellLine xs
     | otherwise = putStr "-" >> displayCellLine xs
 
+cleanCellLine :: CellLine -> CellLine
+cleanCellLine [] = []
+cleanCellLine [x] = []
+cleanCellLine cl = tail (init cl)
+
 firstCellLine :: Int -> CellLine
-firstCellLine w = replicate ((w `div` 2)) False ++ True : replicate ((w `div` 2) - 1) False
+firstCellLine w = replicate ((w `div` 2) + 1) False ++ True : replicate (w `div` 2) False
 
 wolfram :: [Int] -> IO ()
 wolfram [] = return ()
@@ -132,7 +142,7 @@ wolfram [rule, start, lines, window, move] = do
     putStrLn "--- rule converted in bin ------"
     mapM_ print (toBinary rule)
     -- debug --
-    displayCellLine (firstCellLine window)
+    displayCellLine (cleanCellLine (firstCellLine window))
 
 
 main :: IO ()

@@ -119,21 +119,21 @@ applyRule r cl cm cr
     | compareRule r (defNeighborhood cl cm cr) == 1 = True
     | otherwise = False
 
--- evolution :: Rule -> CellLine -> CellLine
--- evolution  _ (x,y) =
--- evolution r (x:y:z:xs) = newCellLine (evolution r y:z:xs) : []
---     where newCellLine arr = applyRule r x y z : arr
+evolution :: Rule -> CellLine -> CellLine
+evolution  _ [x,y] = [y]
+evolution r (x:y:z:xs) = newCellLine (evolution r (y:z:xs))
+    where newCellLine arr = applyRule r x y z : arr
 
 displayCellLine :: CellLine -> IO ()
 displayCellLine [] = putStr "\n"
 displayCellLine (x:xs)
     | x = putStr "*" >> displayCellLine xs
-    | otherwise = putStr "-" >> displayCellLine xs
+    | otherwise = putStr " " >> displayCellLine xs
 
 cleanCellLine :: CellLine -> CellLine
 cleanCellLine [] = []
 cleanCellLine [x] = []
-cleanCellLine cl = tail (init cl)
+cleanCellLine cl =  tail (init cl)
 
 firstCellLine :: Int -> CellLine
 firstCellLine w = replicate ((w `div` 2) + 1) False ++ True : replicate (w `div` 2) False
@@ -141,27 +141,20 @@ firstCellLine w = replicate ((w `div` 2) + 1) False ++ True : replicate (w `div`
 wolfram :: [Int] -> IO ()
 wolfram [] = return ()
 wolfram [a] = return ()
-wolfram [rule, start, lines, window, move] = do
-    -- debug --
-    putStrLn "------ in wolfram ------"
-    print rule
-    print start
-    print lines
-    print window
-    print move
-    putStrLn "--- rule converted in bin ------"
-    mapM_ print (toBinary rule)
-    -- debug --
-    displayCellLine (cleanCellLine (firstCellLine window))
-
+wolfram [rule, start, lines, window, move] = wolfram' (firstCellLine window) start lines
+    where
+    wolfram' cl s l
+        | s > 0 = wolfram' (False : evolution (defRule (toBinary rule)) cl) (s - 1) l
+        | l < 0 = displayCellLine (cleanCellLine cl) >> wolfram' (False : evolution (defRule (toBinary rule)) cl) s l
+        | l > 0 = displayCellLine (cleanCellLine cl) >> wolfram' (False : evolution (defRule (toBinary rule)) cl) s (l - 1)
+        | l == 0 = displayCellLine (cleanCellLine cl) >> return ()
 
 main :: IO ()
 main = do
     args <- getArgs
-    mapM_ putStrLn args
     case args of
         [] -> printUsage >> invalidArguments
-        a -> if checkOptions args then doWolfram args  else printUsage >> invalidArguments
+        a -> if checkOptions args then doWolfram args else printUsage >> invalidArguments
         where
             doWolfram args = wolfram (getOptions (makeTupleArgs args))
             invalidArguments = printErrAndReturn "Invalid arguments" 84

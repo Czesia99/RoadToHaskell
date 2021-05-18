@@ -12,8 +12,8 @@ https://en.wikipedia.org/wiki/Cellular_automaton
 
 ```
 git clone https://github.com/CzesiaLa/RoadToHaskell.git
-cd RoadToHaskell
-cd 03-wolfram
+cd RoadToHaskell/
+cd 03-wolfram/
 make
 ```
 

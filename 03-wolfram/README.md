@@ -1,7 +1,7 @@
 # Wolfram in Haskell
 
 <p align="center">
-<img src="https://i1.wp.com/atlas.wolfram.com/01/01/30/01_01_103_30.gif" alt="wolframn"/><br/>
+<img src="https://en.wikipedia.org/wiki/Cellular_automaton#/media/File:CA_rule30s.png" alt="wolframn"/><br/>
 </p>
 
 The Purpose of this project is to make Wolfram's elementary cellular automaton

@@ -26,7 +26,7 @@ make
 | --move    | NOT IMPLEMENTED                                                              |
 
 
-# Example:
+### Example:
 
 ```
 ./wolfram --rule 30 --lines 20

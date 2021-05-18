@@ -19,7 +19,7 @@ make
 
 | Arguments | Effect                                                                       |
 |-----------|------------------------------------------------------------------------------|
-| --rule    | the ruleset to use (0 to 255)                                                |
+| --rule    | the ruleset to use (0 to 255) (some of the rules might have edge problems)   |
 | --start   | the generation number at which to start the display. The default value is 0. |
 | --lines   | the number of lines to display. When homited, the program never stops.       |        
 | --window  | the number of cells to display on each line (default 80)                     |

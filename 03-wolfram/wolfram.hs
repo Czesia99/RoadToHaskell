@@ -40,6 +40,11 @@ makeTupleArgs :: [String] -> [(String, Int)]
 makeTupleArgs [] = []
 makeTupleArgs (x:y:xs) = (x, read y :: Int) : makeTupleArgs xs
 
+checkRule :: Int -> Bool
+checkRule r
+    | r < 0 || r > 255 = False
+    | otherwise = True
+
 checkFlagValidity :: String -> Bool
 checkFlagValidity f
     | f == "--rule" = True
@@ -147,11 +152,11 @@ cleanCellLine w cl
 wolfram :: [Int] -> IO ()
 wolfram [] = return ()
 wolfram [a] = return ()
-wolfram [r, s, l, w, m] = wolfram' (firstCellLine w) s l
+wolfram [r, s, l, w, m] = if checkRule r then wolfram' (firstCellLine w) s l else printErrAndReturn "Rule must be 0 to 255" 84
     where
     rule = defRule (toBinary r)
     wolfram' cl s l
-        | s > 0 = wolfram' (evolution (defRule (toBinary r)) cl) (s - 1) l
+        | s > 0 = wolfram' (extendCellLine $ evolution rule cl) (s - 1) l
         | l < 0 = displayCellLine (cleanCellLine w cl) >> wolfram' (extendCellLine $ evolution rule cl) s l
         | l > 0 = displayCellLine (cleanCellLine w cl) >> wolfram' (extendCellLine $ evolution rule cl) s (l - 1)
         | l == 0 = displayCellLine (cleanCellLine w cl) >> return ()

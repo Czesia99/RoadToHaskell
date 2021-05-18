@@ -25,6 +25,12 @@ printUsage = putStrLn "Usage:\n wolfram --rule n [--options]\n options:\n\t\
 \--window: the number of cells to display on each line (line width). If even,the central cell is displayed in the next cell on the right. The default value is 80.\n\t\
 \--move: a translation to apply on the window. If negative, the window is translated to the left. If positive, it’s translated to the right."
 
+displayCellLine :: CellLine -> IO ()
+displayCellLine [] = putStr "\n"
+displayCellLine (x:xs)
+    | x = putStr "*" >> displayCellLine xs
+    | otherwise = putStr " " >> displayCellLine xs
+
 ------ arguments management functions ------
 
 readInt :: String -> Maybe Int
@@ -79,7 +85,7 @@ getOptions args = [
 
 ------ real stuff ------
 
-type Cell = Bool
+type Cell = Bool  
 type CellLine = [Cell]
 type CellNeighborhood = Int
 type CellNewState = Cell -> Cell -> Cell -> Cell
@@ -113,7 +119,7 @@ compareRule [] cn = 0
 compareRule ((a,b):xs) cn 
     | cn == a = b
     | otherwise = compareRule xs cn
- 
+
 applyRule :: Rule -> CellNewState
 applyRule r cl cm cr
     | compareRule r (defNeighborhood cl cm cr) == 1 = True
@@ -124,30 +130,31 @@ evolution  _ [x,y] = [y]
 evolution r (x:y:z:xs) = newCellLine (evolution r (y:z:xs))
     where newCellLine arr = applyRule r x y z : arr
 
-displayCellLine :: CellLine -> IO ()
-displayCellLine [] = putStr "\n"
-displayCellLine (x:xs)
-    | x = putStr "*" >> displayCellLine xs
-    | otherwise = putStr " " >> displayCellLine xs
-
-cleanCellLine :: CellLine -> CellLine
-cleanCellLine [] = []
-cleanCellLine [x] = []
-cleanCellLine cl =  tail (init cl)
-
 firstCellLine :: Int -> CellLine
-firstCellLine w = replicate ((w `div` 2) + 1) False ++ True : replicate (w `div` 2) False
+firstCellLine w = replicate (w `div` 2 + 1) False ++ True : replicate (w `div` 2) False
+
+extendCellLine :: CellLine -> CellLine
+extendCellLine [] = []
+extendCellLine cl = False : False : cl ++ [False]
+
+cleanCellLine :: Int -> CellLine -> CellLine
+cleanCellLine _ [] = []
+cleanCellLine _ [x] = []
+cleanCellLine w cl
+    | length cl /= w =  cleanCellLine w (tail (init cl))
+    | otherwise = cl
 
 wolfram :: [Int] -> IO ()
 wolfram [] = return ()
 wolfram [a] = return ()
-wolfram [rule, start, lines, window, move] = wolfram' (firstCellLine window) start lines
+wolfram [r, s, l, w, m] = wolfram' (firstCellLine w) s l
     where
+    rule = defRule (toBinary r)
     wolfram' cl s l
-        | s > 0 = wolfram' (False : evolution (defRule (toBinary rule)) cl) (s - 1) l
-        | l < 0 = displayCellLine (cleanCellLine cl) >> wolfram' (False : evolution (defRule (toBinary rule)) cl) s l
-        | l > 0 = displayCellLine (cleanCellLine cl) >> wolfram' (False : evolution (defRule (toBinary rule)) cl) s (l - 1)
-        | l == 0 = displayCellLine (cleanCellLine cl) >> return ()
+        | s > 0 = wolfram' (evolution (defRule (toBinary r)) cl) (s - 1) l
+        | l < 0 = displayCellLine (cleanCellLine w cl) >> wolfram' (extendCellLine $ evolution rule cl) s l
+        | l > 0 = displayCellLine (cleanCellLine w cl) >> wolfram' (extendCellLine $ evolution rule cl) s (l - 1)
+        | l == 0 = displayCellLine (cleanCellLine w cl) >> return ()
 
 main :: IO ()
 main = do
@@ -158,3 +165,5 @@ main = do
         where
             doWolfram args = wolfram (getOptions (makeTupleArgs args))
             invalidArguments = printErrAndReturn "Invalid arguments" 84
+
+-- ┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻

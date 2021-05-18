@@ -12,3 +12,5 @@
 - [Day02](./02-day2)
     - Handle errors in a more elegant way than with the error function, manage side effects (input and outputs).
     Build an executable with Haskell
+- [Wolfram](./03-wolfram)
+    - 1D Wolfram's Cellular Automaton

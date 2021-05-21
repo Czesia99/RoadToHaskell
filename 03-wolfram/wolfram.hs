@@ -47,11 +47,7 @@ checkRule r
 
 checkFlagValidity :: String -> Bool
 checkFlagValidity f
-    | f == "--rule" = True
-    | f == "--start" = True
-    | f == "--lines" = True
-    | f == "--window" = True
-    | f == "--move" = True
+    | f == "--rule" || f == "--start" || f == "--lines" || f == "--window" || f == "--move" = True
     | otherwise = False
 
 checkFlagValue :: String -> Bool
@@ -72,6 +68,7 @@ defaultFlagValue f
     | f == "--lines" = -1
     | f == "--window" = 80
     | f == "--move" = 0
+    | otherwise = 0
 
 getFlagValue :: [(String, Int)] -> String -> Int
 getFlagValue [] f = defaultFlagValue f

@@ -1,0 +1,1 @@
+# Image Compressor in Haskell

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7a59e8bcf1af173397f622854a917bf3ac08021d4a28949f9954e7f4ecac1657
+-- hash: 9883f3aef240bfedb6b58c439a9fab79f9dd506edda5f3d349ece974405d8493
 
 name:           image-compressor
 version:        0.1.0.0
@@ -27,7 +27,9 @@ source-repository head
 
 library
   exposed-modules:
+      Color
       Lib
+      Position
   other-modules:
       Paths_image_compressor
   hs-source-dirs:

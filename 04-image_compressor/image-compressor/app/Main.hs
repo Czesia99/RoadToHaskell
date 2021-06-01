@@ -82,13 +82,22 @@ instance Num Pixel where
 instance Read Pixel where
     readsPrec _ input = [(Pixel pos col, rest2)]
         where
-            [(pos, rest1)] = readsPrec 0 input :: [(Position, String)]
-            [(col, rest2)] = readsPrec 0 rest1 :: [(Color, String)]
+            [(pos, rest1)] = reads input :: [(Position, String)]
+            [(col, rest2)] = reads rest1 :: [(Color, String)]
 
 data Cluster = Cluster Color [Pixel]
 
 instance Show Cluster where
     show (Cluster col pixels) = "--\n" ++ show col ++ "\n-" ++ show pixels
+
+getColor :: Pixel -> Color
+getColor (Pixel pos col) = col
+
+getPosition :: Pixel -> Position
+getPosition (Pixel pos col) = pos
+
+inputToPixel :: String -> Pixel
+inputToPixel input = read input :: Pixel
 
 printUsage :: IO()
 printUsage = putStrLn "USAGE: ./imageCompressor n e IN\n\n\t\
@@ -102,12 +111,13 @@ euclidianDistance (r1, g1, b1) (r2, g2, b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 + 
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
-imageCompressor :: a -> b -> FilePath -> IO ()
+imageCompressor :: a -> b -> FilePath -> IO()
 imageCompressor n e infile = do
     text <- readFile infile
+    -- inputToPixel text
     putStrLn text
 
 main :: IO ()
 main = do
     args <- getArgs
-    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else (imageCompressor (args!!0) (args!!1) (args!!2))
+    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else imageCompressor (head args) (args!!1) (args!!2)

@@ -127,6 +127,8 @@ imageCompressor :: a -> b -> FilePath -> IO()
 imageCompressor n e infile = do
     text <- readFile infile
     putStrLn (show (inputToPixel text))
+    -- text <- fmap lines (readFile infile)
+    -- putStrLn (show ((map inputToPixel text)))
 
 
 main :: IO ()

@@ -85,19 +85,25 @@ instance Read Pixel where
             [(pos, rest1)] = reads input :: [(Position, String)]
             [(col, rest2)] = reads rest1 :: [(Color, String)]
 
-data Cluster = Cluster Color [Pixel]
+-- data Cluster = Cluster Color [Pixel]
 
-instance Show Cluster where
-    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-" ++ show pixels
+-- instance Show Cluster where
+--     show (Cluster col pixels) = "--\n" ++ show col ++ "\n-" ++ show pixels
 
 getColor :: Pixel -> Color
 getColor (Pixel pos col) = col
 
+setColor :: Pixel -> Color -> Pixel
+setColor (Pixel pos col) col' = (Pixel pos col')
+
 getPosition :: Pixel -> Position
 getPosition (Pixel pos col) = pos
 
+setPosition :: Pixel -> Position -> Pixel
+setPosition (Pixel pos col) pos' = (Pixel pos' col)
+
 inputToPixel :: String -> Pixel
-inputToPixel input = read input :: Pixel
+inputToPixel input = ((read input) :: Pixel)
 
 printUsage :: IO()
 printUsage = putStrLn "USAGE: ./imageCompressor n e IN\n\n\t\
@@ -105,17 +111,23 @@ printUsage = putStrLn "USAGE: ./imageCompressor n e IN\n\n\t\
 \e\tconvergence limit\n\t\
 \IN\tpath to the file containing the colors of the pixels"
 
-euclidianDistance :: (Double, Double, Double) -> (Double, Double, Double) -> Double
-euclidianDistance (r1, g1, b1) (r2, g2, b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2)
+-- euclidianDistance :: (Double, Double, Double) -> (Double, Double, Double) -> Double
+-- euclidianDistance (r1, g1, b1) (r2, g2, b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2)
+
+eDistColor :: Color -> Color -> Double
+eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2)
 
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
+-- showPixels :: String -> Pixel
+-- showPixels text = inputToPixel text 
+
 imageCompressor :: a -> b -> FilePath -> IO()
 imageCompressor n e infile = do
     text <- readFile infile
-    -- inputToPixel text
-    putStrLn text
+    putStrLn (show (inputToPixel text))
+
 
 main :: IO ()
 main = do

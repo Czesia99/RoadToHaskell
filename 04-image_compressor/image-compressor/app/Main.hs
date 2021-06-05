@@ -63,7 +63,7 @@ instance Read Color where
             takeG :: String -> String
             takeG = takeWhile (/= ',') . tail . dropWhile (/=',')
             takeB :: String -> String
-            takeB = takeWhile (/= ')') . tail . dropWhile (/=',')
+            takeB = tail . takeWhile (/=')') . tail . dropWhile (/=',') . tail . dropWhile (/=',')
             takeRest :: String -> String
             takeRest = tail . dropWhile (/= ')')
 
@@ -82,8 +82,8 @@ instance Num Pixel where
 instance Read Pixel where
     readsPrec _ input = [(Pixel pos col, rest2)]
         where
-            [(pos, rest1)] = reads input :: [(Position, String)]
-            [(col, rest2)] = reads rest1 :: [(Color, String)]
+            [(pos, rest1)] = readsPrec 0 input :: [(Position, String)]
+            [(col, rest2)] = readsPrec 0 rest1 :: [(Color, String)]
 
 -- data Cluster = Cluster Color [Pixel]
 
@@ -94,13 +94,13 @@ getColor :: Pixel -> Color
 getColor (Pixel pos col) = col
 
 setColor :: Pixel -> Color -> Pixel
-setColor (Pixel pos col) col' = (Pixel pos col')
+setColor (Pixel pos col) col' = Pixel pos col'
 
 getPosition :: Pixel -> Position
 getPosition (Pixel pos col) = pos
 
 setPosition :: Pixel -> Position -> Pixel
-setPosition (Pixel pos col) pos' = (Pixel pos' col)
+setPosition (Pixel pos col) pos' = Pixel pos' col
 
 inputToPixel :: String -> Pixel
 inputToPixel input = ((read input) :: Pixel)
@@ -123,13 +123,14 @@ addPosition p1 p2 = p1 + p2
 -- showPixels :: String -> Pixel
 -- showPixels text = inputToPixel text 
 
-imageCompressor :: a -> b -> FilePath -> IO()
+imageCompressor :: a -> b -> FilePath -> IO ()
 imageCompressor n e infile = do
-    text <- readFile infile
-    putStrLn (show (inputToPixel text))
-    -- text <- fmap lines (readFile infile)
-    -- putStrLn (show ((map inputToPixel text)))
-
+    -- text <- readFile infile
+    -- putStrLn (show  $ inputToPixel text)
+    -- putStrLn $ show $ read text :: Pixel
+    -- putStrLn (show (inputToPixel text))
+    text <- fmap lines (readFile infile)
+    putStrLn (show ((map inputToPixel text)))
 
 main :: IO ()
 main = do

@@ -19,6 +19,7 @@ import Data.Char
 import System.Exit
 import System.IO
 import Control.Monad
+import System.Random
 
 data Position = Position Int Int
 
@@ -96,7 +97,7 @@ getColor :: Pixel -> Color
 getColor (Pixel pos col) = col
 
 setColor :: Pixel -> Color -> Pixel
-setColor (Pixel pos col) = Pixel pos
+setColor (Pixel pos col) col' = Pixel pos col'
 
 getPosition :: Pixel -> Position
 getPosition (Pixel pos col) = pos
@@ -119,6 +120,9 @@ setClusterPixels (Cluster col pixels) pixels' = Cluster col pixels'
 inputToPixel :: String -> Pixel
 inputToPixel input = read input :: Pixel
 
+inputToPixels :: [String] -> [Pixel]
+inputToPixels = map inputToPixel
+
 printUsage :: IO()
 printUsage = putStrLn "USAGE: ./imageCompressor n e IN\n\n\t\
 \n\tnumber of colors in the final image\n\t\
@@ -133,8 +137,11 @@ addPosition p1 p2 = p1 + p2
 
 --- step 1 define K centroids randomly ---
 
-defineKCentroids :: Int -> [Cluster]
-defineKCentroids k = undefined
+defineKCentroids :: Int -> [Pixel] -> [Cluster]
+defineKCentroids k pixels = undefined
+
+randomPixel :: [Pixel] -> Pixel
+randomPixel = undefined
 
 --- step 2 regroup to the closest centroid ---
 
@@ -146,15 +153,11 @@ regroupToCentroid = undefined
 replaceCentroidToCenter :: [Cluster] -> [Cluster]
 replaceCentroidToCenter = undefined
 
-
-imageCompressor :: a -> b -> FilePath -> IO ()
+imageCompressor :: Int -> b -> FilePath -> IO ()
 imageCompressor n e infile = do
-    -- text <- readFile infile
-    -- putStrLn (show  $ inputToPixel text)
-    -- putStrLn $ show $ read text :: Pixel
-    -- putStrLn (show (inputToPixel text))
     text <- fmap lines (readFile infile)
-    mapM_ print (map inputToPixel text)
+    mapM_ print (inputToPixels text)
+    -- mapM_ print (defineKCentroids n (inputToPixels text))
 
 main :: IO ()
 main = do

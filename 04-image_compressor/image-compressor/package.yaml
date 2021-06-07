@@ -35,6 +35,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - image-compressor
+    - random
 
 tests:
   image-compressor-test:

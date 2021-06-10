@@ -138,10 +138,24 @@ addPosition p1 p2 = p1 + p2
 --- step 1 define K centroids randomly ---
 
 defineKCentroids :: Int -> [Pixel] -> [Cluster]
-defineKCentroids k pixels = undefined
+defineKCentroids k pixels = do undefined
 
-randomPixel :: [Pixel] -> Pixel
-randomPixel = undefined
+defineKCentroidsA :: Int -> [Pixel] -> [Pixel]
+defineKCentroidsA k pixels = undefined 
+
+randomPixel :: [Pixel] -> IO Pixel
+randomPixel pixels = (pixels !!) <$> randomRIO (0, length pixels - 1)
+
+nextBounded :: Int -> StdGen -> (Int, StdGen)
+nextBounded bound s = (i `mod` bound, s') where
+   (i, s') = next s
+
+testRandom :: Int -> Int
+testRandom i = fst (next (mkStdGen i))
+
+-- possible errors
+-- k > nb colors in image
+-- no need to compress a uniform image
 
 --- step 2 regroup to the closest centroid ---
 
@@ -153,10 +167,13 @@ regroupToCentroid = undefined
 replaceCentroidToCenter :: [Cluster] -> [Cluster]
 replaceCentroidToCenter = undefined
 
-imageCompressor :: Int -> b -> FilePath -> IO ()
+imageCompressor :: a -> b -> FilePath -> IO ()
 imageCompressor n e infile = do
     text <- fmap lines (readFile infile)
     mapM_ print (inputToPixels text)
+    putStrLn "------"
+    pix <- randomPixel (inputToPixels text)
+    print pix
     -- mapM_ print (defineKCentroids n (inputToPixels text))
 
 main :: IO ()

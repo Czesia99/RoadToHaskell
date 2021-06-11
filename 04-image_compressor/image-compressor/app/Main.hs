@@ -142,13 +142,28 @@ addPosition p1 p2 = p1 + p2
 defineKCentroids :: Int -> [Pixel] -> [Cluster]
 defineKCentroids k pixels = do undefined
 
-defineKCentroidsA :: Int -> [Pixel] -> [IO Pixel]
-defineKCentroidsA k pixels = defineK k pixels [] where
-    defineK 0 _ centroids = centroids
-    defineK k pixels centroids = defineK (k - 1) pixels (randomPixel pixels : centroids)
+selectColors :: Int -> [Pixel] -> [Color]
+selectColors n pixels = select n (map getColor pixels) []
+    where
+        select 0 _ selectedColors = selectedColors
+        select n (x:xs) selectedColors
+            | null selectedColors = select (n - 1) xs (x : selectedColors)
+            | isColorDifferent x selectedColors = select (n - 1) xs (x : selectedColors)
+            | otherwise = select n xs selectedColors
 
-randomPixel :: [Pixel] -> IO Pixel
-randomPixel pixels = (pixels !!) <$> randomRIO (0, length pixels - 1)
+isColorDifferent :: Color -> [Color] -> Bool
+isColorDifferent _ [] = True
+isColorDifferent c1 (x:xs)
+    | c1 == x = False
+    | otherwise = isColorDifferent c1 xs
+
+-- defineKCentroidsA :: Int -> [Pixel] -> [IO Pixel]
+-- defineKCentroidsA k pixels = defineK k pixels [] where
+--     defineK 0 _ centroids = centroids
+--     defineK k pixels centroids = defineK (k - 1) pixels (randomPixel pixels : centroids)
+
+-- randomPixel :: [Pixel] -> IO Pixel
+-- randomPixel pixels = (pixels !!) <$> randomRIO (0, length pixels - 1)
 
 -- possible errors
 -- k > nb colors in image
@@ -169,9 +184,10 @@ imageCompressor n e infile = do
     text <- fmap lines (readFile infile)
     mapM_ print (inputToPixels text)
     putStrLn "------"
+    mapM_ print (selectColors n (inputToPixels text))
     -- mapM_ print (defineKCentroidsA n (inputToPixels text))
     -- mapM_ print pix
-    -- print pix
+    -- print pix 
     -- mapM_ print (defineKCentroidsA n (inputToPixels text))
 
 main :: IO ()

@@ -137,6 +137,9 @@ eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 +
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
+type PreviousClusters = [Cluster]
+type NewClusters = [Cluster]
+
 --- step 1 define K centroids randomly ---
 
 defineKCentroids :: Int -> [Pixel] -> [Cluster]
@@ -153,9 +156,9 @@ selectColors n pixels = select n (map getColor pixels) []
 
 isColorDifferent :: Color -> [Color] -> Bool
 isColorDifferent _ [] = True
-isColorDifferent c1 (x:xs)
-    | c1 == x = False
-    | otherwise = isColorDifferent c1 xs
+isColorDifferent c (x:xs)
+    | c == x = False
+    | otherwise = isColorDifferent c xs
 
 -- defineKCentroidsA :: Int -> [Pixel] -> [IO Pixel]
 -- defineKCentroidsA k pixels = defineK k pixels [] where

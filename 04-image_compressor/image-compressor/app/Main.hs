@@ -13,9 +13,11 @@ import Lib
 -- import Color
 
 import System.Environment
+import Text.Read
 import Data.List
 import Data.Tuple
 import Data.Char
+import Data.Maybe
 import System.Exit
 import System.IO
 import Control.Monad
@@ -140,18 +142,13 @@ addPosition p1 p2 = p1 + p2
 defineKCentroids :: Int -> [Pixel] -> [Cluster]
 defineKCentroids k pixels = do undefined
 
-defineKCentroidsA :: Int -> [Pixel] -> [Pixel]
-defineKCentroidsA k pixels = undefined 
+defineKCentroidsA :: Int -> [Pixel] -> [IO Pixel]
+defineKCentroidsA k pixels = defineK k pixels [] where
+    defineK 0 _ centroids = centroids
+    defineK k pixels centroids = defineK (k - 1) pixels (randomPixel pixels : centroids)
 
 randomPixel :: [Pixel] -> IO Pixel
 randomPixel pixels = (pixels !!) <$> randomRIO (0, length pixels - 1)
-
-nextBounded :: Int -> StdGen -> (Int, StdGen)
-nextBounded bound s = (i `mod` bound, s') where
-   (i, s') = next s
-
-testRandom :: Int -> Int
-testRandom i = fst (next (mkStdGen i))
 
 -- possible errors
 -- k > nb colors in image
@@ -167,16 +164,17 @@ regroupToCentroid = undefined
 replaceCentroidToCenter :: [Cluster] -> [Cluster]
 replaceCentroidToCenter = undefined
 
-imageCompressor :: a -> b -> FilePath -> IO ()
+imageCompressor :: Int -> b -> FilePath -> IO ()
 imageCompressor n e infile = do
     text <- fmap lines (readFile infile)
     mapM_ print (inputToPixels text)
     putStrLn "------"
-    pix <- randomPixel (inputToPixels text)
-    print pix
-    -- mapM_ print (defineKCentroids n (inputToPixels text))
+    -- mapM_ print (defineKCentroidsA n (inputToPixels text))
+    -- mapM_ print pix
+    -- print pix
+    -- mapM_ print (defineKCentroidsA n (inputToPixels text))
 
 main :: IO ()
 main = do
     args <- getArgs
-    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else imageCompressor (head args) (args!!1) (args!!2)
+    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else imageCompressor (read (head args) :: Int) (args!!1) (args!!2)

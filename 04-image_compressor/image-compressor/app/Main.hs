@@ -91,7 +91,7 @@ instance Read Pixel where
 data Cluster = Cluster Color [Pixel]
 
 instance Show Cluster where
-    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-" ++ show pixels
+    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ show pixels
 
 --- utils ---
 
@@ -137,19 +137,21 @@ eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 +
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
-type PreviousClusters = [Cluster]
-type NewClusters = [Cluster]
 
 --- step 1 define K centroids randomly ---
 
-defineKCentroids :: Int -> [Pixel] -> [Cluster]
-defineKCentroids k pixels = do undefined
+defineKCentroids :: [Color] -> [Cluster]
+defineKCentroids selectedColors = createCluster selectedColors [] where
+    createCluster [] c = c
+    createCluster (x:xs) clusters  = createCluster xs (Cluster x [] : clusters)
+
+-- defineClusterColor :: [Color] -> [Cluster]
 
 selectColors :: Int -> [Pixel] -> [Color]
 selectColors n pixels = select n (map getColor pixels) []
     where
-        select 0 _ selectedColors = selectedColors
         select n (x:xs) selectedColors
+            | n == 0 = selectedColors
             | null selectedColors = select (n - 1) xs (x : selectedColors)
             | isColorDifferent x selectedColors = select (n - 1) xs (x : selectedColors)
             | otherwise = select n xs selectedColors
@@ -159,11 +161,6 @@ isColorDifferent _ [] = True
 isColorDifferent c (x:xs)
     | c == x = False
     | otherwise = isColorDifferent c xs
-
--- defineKCentroidsA :: Int -> [Pixel] -> [IO Pixel]
--- defineKCentroidsA k pixels = defineK k pixels [] where
---     defineK 0 _ centroids = centroids
---     defineK k pixels centroids = defineK (k - 1) pixels (randomPixel pixels : centroids)
 
 -- randomPixel :: [Pixel] -> IO Pixel
 -- randomPixel pixels = (pixels !!) <$> randomRIO (0, length pixels - 1)
@@ -187,7 +184,8 @@ imageCompressor n e infile = do
     text <- fmap lines (readFile infile)
     mapM_ print (inputToPixels text)
     putStrLn "------"
-    mapM_ print (selectColors n (inputToPixels text))
+    -- mapM_ print (selectColors n (inputToPixels text))
+    mapM_ print (defineKCentroids (selectColors n (inputToPixels text)))
     -- mapM_ print (defineKCentroidsA n (inputToPixels text))
     -- mapM_ print pix
     -- print pix 

@@ -137,13 +137,15 @@ eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 +
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
-
 --- step 1 define K centroids randomly ---
 
-defineKCentroids :: [Color] -> [Cluster]
-defineKCentroids selectedColors = createCluster selectedColors [] where
+defineKCentroids :: Int -> [Pixel] -> [Cluster]
+defineKCentroids k pixels = createCluster (selectColors k pixels) [] where
     createCluster [] c = c
-    createCluster (x:xs) clusters  = createCluster xs (Cluster x [] : clusters)
+    createCluster (x:xs) c = createCluster xs (Cluster x [] : c)
+
+regroupPixelsToColor :: Color -> [Pixel] -> [Pixel]
+regroupPixelsToColor col pixels = undefined
 
 -- defineClusterColor :: [Color] -> [Cluster]
 
@@ -185,7 +187,7 @@ imageCompressor n e infile = do
     mapM_ print (inputToPixels text)
     putStrLn "------"
     -- mapM_ print (selectColors n (inputToPixels text))
-    mapM_ print (defineKCentroids (selectColors n (inputToPixels text)))
+    mapM_ print (defineKCentroids n (inputToPixels text))
     -- mapM_ print (defineKCentroidsA n (inputToPixels text))
     -- mapM_ print pix
     -- print pix 

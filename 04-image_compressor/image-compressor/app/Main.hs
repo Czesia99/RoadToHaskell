@@ -49,7 +49,7 @@ instance Read Position where
 data Color = Color Double Double Double
 
 instance Show Color where
-    show (Color r g b) = "(" ++ show r ++ "," ++ show g ++ "," ++ show b ++ ")"
+    show (Color r g b) = "(" ++ show r  ++ "," ++ show g ++ "," ++ show b ++ ")"
 
 instance Eq Color where
     (Color r1 g1 b1) == (Color r2 g2 b2) = r1 == r2 && g1 == g2 && b1 == b2
@@ -137,17 +137,24 @@ eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 +
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
+type SelectedColors = [Color]
 --- step 1 define K centroids randomly ---
 
 defineKCentroids :: Int -> [Pixel] -> [Cluster]
-defineKCentroids k pixels = createCluster (selectColors k pixels) [] where
-    createCluster [] c = c
-    createCluster (x:xs) c = createCluster xs (Cluster x [] : c)
+defineKCentroids k pixels = createCluster selectedColors []
+    where
+        createCluster [] c = c
+        createCluster (x:xs) c = createCluster xs (Cluster x (regroupPixelsToColor x selectedColors pixels) : c)
+        selectedColors = (selectColors k pixels)
 
-regroupPixelsToColor :: Color -> [Pixel] -> [Pixel]
-regroupPixelsToColor col pixels = undefined
+regroupPixelsToColor :: Color -> SelectedColors -> [Pixel] -> [Pixel]
+regroupPixelsToColor col sc pixels = filter (isNearestPixelToColor col sc) pixels
 
--- defineClusterColor :: [Color] -> [Cluster]
+isNearestPixelToColor :: Color -> SelectedColors -> Pixel -> Bool
+isNearestPixelToColor col [] pixel = True
+isNearestPixelToColor col (x:xs) pixel
+    | eDistColor col (getColor pixel) <= eDistColor x (getColor pixel) = isNearestPixelToColor col xs pixel
+    | otherwise = False
 
 selectColors :: Int -> [Pixel] -> [Color]
 selectColors n pixels = select n (map getColor pixels) []
@@ -188,10 +195,6 @@ imageCompressor n e infile = do
     putStrLn "------"
     -- mapM_ print (selectColors n (inputToPixels text))
     mapM_ print (defineKCentroids n (inputToPixels text))
-    -- mapM_ print (defineKCentroidsA n (inputToPixels text))
-    -- mapM_ print pix
-    -- print pix 
-    -- mapM_ print (defineKCentroidsA n (inputToPixels text))
 
 main :: IO ()
 main = do

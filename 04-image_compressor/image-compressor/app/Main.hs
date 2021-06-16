@@ -21,6 +21,7 @@ import Data.Maybe
 import System.Exit
 import System.IO
 import Control.Monad
+import Text.Printf
 import System.Random
 
 data Position = Position Int Int
@@ -49,7 +50,7 @@ instance Read Position where
 data Color = Color Double Double Double
 
 instance Show Color where
-    show (Color r g b) = "(" ++ show r  ++ "," ++ show g ++ "," ++ show b ++ ")"
+    show (Color r g b) = "(" ++ printf "%.f" r ++ "," ++ printf "%.f" g ++ "," ++ printf "%.f" b ++ ")"
 
 instance Eq Color where
     (Color r1 g1 b1) == (Color r2 g2 b2) = r1 == r2 && g1 == g2 && b1 == b2
@@ -73,7 +74,7 @@ instance Read Color where
 data Pixel = Pixel Position Color
 
 instance Show Pixel where
-    show (Pixel pos col) = show pos ++ " " ++ show col
+    show (Pixel pos col) = show pos ++ " " ++ show col ++ "\n"
 
 instance Eq Pixel where
     (Pixel pos1 col1) == (Pixel pos2 col2) = pos1 == pos2 && col1 == col2
@@ -91,9 +92,12 @@ instance Read Pixel where
 data Cluster = Cluster Color [Pixel]
 
 instance Show Cluster where
-    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ show pixels
+    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ show  pixels --showNoBrackets pixels
 
 --- utils ---
+
+showNoBrackets :: Show a => a -> [Char]
+showNoBrackets x = [c | c <- show x, c /= '[' && c/= ']']
 
 getColor :: Pixel -> Color
 getColor (Pixel pos col) = col

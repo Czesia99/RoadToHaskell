@@ -142,7 +142,6 @@ addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
 type SelectedColors = [Color]
---- step 1 define K centroids randomly ---
 
 defineKCentroids :: Int -> [Pixel] -> [Cluster]
 defineKCentroids k pixels = createCluster selectedColors []
@@ -175,19 +174,13 @@ isColorDifferent c (x:xs)
     | c == x = False
     | otherwise = isColorDifferent c xs
 
--- randomPixel :: [Pixel] -> IO Pixel
--- randomPixel pixels = (pixels !!) <$> randomRIO (0, length pixels - 1)
-
--- possible errors
--- k > nb colors in image
--- no need to compress a uniform image
-
---- step 2 regroup to the closest centroid ---
-
-regroupToCentroid :: [Pixel] -> [Cluster]
-regroupToCentroid = undefined
 
 --- step 3 replace centroid to center & check convergence limit ---
+
+-- clusterColorAverage :: [Pixel] -> Color
+-- clusterColorAverage pixels = Color (average r) (average b) (average g)
+--     where
+--         average n (x:xs) = (Color (map (+) r  `div` n) (map (+) g `div` ))
 
 replaceCentroidToCenter :: [Cluster] -> [Cluster]
 replaceCentroidToCenter = undefined

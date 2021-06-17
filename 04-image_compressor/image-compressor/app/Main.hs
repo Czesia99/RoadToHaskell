@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 --
 -- EPITECH PROJECT, 2021
 -- Image Compressor
@@ -177,21 +178,25 @@ isColorDifferent c (x:xs)
 
 --- step 3 replace centroid to center & check convergence limit ---
 
--- clusterColorAverage :: [Pixel] -> Color
--- clusterColorAverage pixels = Color (average r) (average b) (average g)
+-- clusterAverage :: [Pixel] -> Color
+-- clusterAverage pixels = Color (average r) (average b) (average g)
 --     where
 --         average n (x:xs) = (Color (map (+) r  `div` n) (map (+) g `div` ))
 
-replaceCentroidToCenter :: [Cluster] -> [Cluster]
-replaceCentroidToCenter = undefined
+replaceCentroid :: [Cluster] -> [Cluster]
+replaceCentroid = undefined
+
+isKmeanDone :: Double -> [Cluster] -> [Cluster] -> Bool
+isKmeanDone _ [] [] = True
+isKmeanDone e (x:xs) (y:ys)
+    | eDistColor (getClusterColor x) (getClusterColor y) <= e = isKmeanDone e xs ys
+    | otherwise = False
 
 imageCompressor :: Int -> b -> FilePath -> IO ()
-imageCompressor n e infile = do
+imageCompressor k e infile = do
     text <- fmap lines (readFile infile)
-    mapM_ print (inputToPixels text)
-    putStrLn "------"
     -- mapM_ print (selectColors n (inputToPixels text))
-    mapM_ print (defineKCentroids n (inputToPixels text))
+    mapM_ print (defineKCentroids k (inputToPixels text))
 
 main :: IO ()
 main = do

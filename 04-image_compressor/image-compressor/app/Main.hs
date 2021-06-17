@@ -75,7 +75,7 @@ instance Read Color where
 data Pixel = Pixel Position Color
 
 instance Show Pixel where
-    show (Pixel pos col) = show pos ++ " " ++ show col ++ "\n"
+    show (Pixel pos col) = show pos ++ " " ++ show col
 
 instance Eq Pixel where
     (Pixel pos1 col1) == (Pixel pos2 col2) = pos1 == pos2 && col1 == col2
@@ -93,12 +93,21 @@ instance Read Pixel where
 data Cluster = Cluster Color [Pixel]
 
 instance Show Cluster where
-    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ show  pixels --showNoBrackets pixels
+    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ intercalate "\n" (map show pixels) --showNoBrackets pixels
 
 --- utils ---
 
 showNoBrackets :: Show a => a -> [Char]
 showNoBrackets x = [c | c <- show x, c /= '[' && c/= ']']
+
+getColorR :: Color -> Double
+getColorR (Color r g b) = r
+
+getColorG :: Color -> Double
+getColorG (Color r g b) = g
+
+getColorB :: Color -> Double
+getColorB (Color r g b) = b
 
 getColor :: Pixel -> Color
 getColor (Pixel pos col) = col
@@ -175,16 +184,15 @@ isColorDifferent c (x:xs)
     | c == x = False
     | otherwise = isColorDifferent c xs
 
-
---- step 3 replace centroid to center & check convergence limit ---
-
--- clusterAverage :: [Pixel] -> Color
--- clusterAverage pixels = Color (average r) (average b) (average g)
---     where
---         average n (x:xs) = (Color (map (+) r  `div` n) (map (+) g `div` ))
+clusterAverage :: [Pixel] -> Color
+clusterAverage pixels = Color averageR averageG averageB
+    where
+        averageR = foldl (+) 0 (map getColorR (map getColor pixels)) / fromIntegral (length pixels)
+        averageG = foldl (+) 0 (map getColorG (map getColor pixels)) / fromIntegral (length pixels)
+        averageB = foldl (+) 0 (map getColorB (map getColor pixels)) / fromIntegral (length pixels)
 
 replaceCentroid :: [Cluster] -> [Cluster]
-replaceCentroid = undefined
+replaceCentroid (x:xs) = undefined
 
 isKmeanDone :: Double -> [Cluster] -> [Cluster] -> Bool
 isKmeanDone _ [] [] = True
@@ -195,7 +203,6 @@ isKmeanDone e (x:xs) (y:ys)
 imageCompressor :: Int -> b -> FilePath -> IO ()
 imageCompressor k e infile = do
     text <- fmap lines (readFile infile)
-    -- mapM_ print (selectColors n (inputToPixels text))
     mapM_ print (defineKCentroids k (inputToPixels text))
 
 main :: IO ()

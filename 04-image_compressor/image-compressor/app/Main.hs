@@ -93,12 +93,9 @@ instance Read Pixel where
 data Cluster = Cluster Color [Pixel]
 
 instance Show Cluster where
-    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ intercalate "\n" (map show pixels) --showNoBrackets pixels
+    show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ intercalate "\n" (map show pixels)
 
 --- utils ---
-
-showNoBrackets :: Show a => a -> [Char]
-showNoBrackets x = [c | c <- show x, c /= '[' && c/= ']']
 
 getColorR :: Color -> Double
 getColorR (Color r g b) = r
@@ -158,7 +155,7 @@ defineKCentroids k pixels = createCluster selectedColors []
     where
         createCluster [] c = c
         createCluster (x:xs) c = createCluster xs (Cluster x (regroupPixelsToColor x selectedColors pixels) : c)
-        selectedColors = (selectColors k pixels)
+        selectedColors = selectColors k pixels
 
 regroupPixelsToColor :: Color -> SelectedColors -> [Pixel] -> [Pixel]
 regroupPixelsToColor col sc pixels = filter (isNearestPixelToColor col sc) pixels
@@ -191,21 +188,42 @@ clusterAverage pixels = Color averageR averageG averageB
         averageG = foldl (+) 0 (map getColorG (map getColor pixels)) / fromIntegral (length pixels)
         averageB = foldl (+) 0 (map getColorB (map getColor pixels)) / fromIntegral (length pixels)
 
-replaceCentroid :: [Cluster] -> [Cluster]
-replaceCentroid (x:xs) = undefined
-
+replaceCentroids :: [Pixel] -> [Cluster] -> [Cluster]
+replaceCentroids pixels clusters  = newClusters clusters []
+    where
+        newClusters [] nc = nc
+        newClusters (x:xs) nc = newClusters xs (Cluster (newColor x) (newPixelGroup x) : nc)
+        newColor cluster = clusterAverage (getClusterPixels cluster)
+        newPixelGroup cluster = regroupPixelsToColor (newColor cluster) (map getClusterColor clusters) pixels
+ 
 isKmeanDone :: Double -> [Cluster] -> [Cluster] -> Bool
 isKmeanDone _ [] [] = True
 isKmeanDone e (x:xs) (y:ys)
-    | eDistColor (getClusterColor x) (getClusterColor y) <= e = isKmeanDone e xs ys
-    | otherwise = False
+    | eDistColor (getClusterColor x) (getClusterColor y) > e = False
+    | otherwise = isKmeanDone e xs ys
 
-imageCompressor :: Int -> b -> FilePath -> IO ()
+imageCompressor :: Int -> Double -> FilePath -> IO ()
 imageCompressor k e infile = do
     text <- fmap lines (readFile infile)
-    mapM_ print (defineKCentroids k (inputToPixels text))
+    let pixels = inputToPixels text
+    putStrLn "------"
+    let firstselec =  (defineKCentroids k pixels)
+    print firstselec
+    putStrLn "+++++++++++++"
+    let firstround = replaceCentroids pixels firstselec
+    print firstround
+    putStrLn "++++++++++++++"
+    let secondround = replaceCentroids pixels firstround
+    print secondround
+    putStrLn "------"
+    doKmean pixels (defineKCentroids k pixels) (replaceCentroids pixels (defineKCentroids k pixels))
+        where
+            doKmean pixels cx cy
+                | isKmeanDone e cx cy = putStrLn (show cy)
+                | otherwise = doKmean pixels cy (replaceCentroids pixels cy)
+    -- mapM_ print (defineKCentroids k pixels)
 
 main :: IO ()
 main = do
     args <- getArgs
-    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else imageCompressor (read (head args) :: Int) (args!!1) (args!!2)
+    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else imageCompressor (read (head args) :: Int) (read (args!!1) :: Double) (args!!2)

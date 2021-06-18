@@ -191,11 +191,11 @@ clusterAverage pixels = Color averageR averageG averageB
 replaceCentroids :: [Pixel] -> [Cluster] -> [Cluster]
 replaceCentroids pixels clusters  = newClusters clusters []
     where
-        newClusters [] nc = nc
+        newClusters [] nc = reverse nc
         newClusters (x:xs) nc = newClusters xs (Cluster (newColor x) (newPixelGroup x) : nc)
         newColor cluster = clusterAverage (getClusterPixels cluster)
-        newPixelGroup cluster = regroupPixelsToColor (newColor cluster) (map getClusterColor clusters) pixels
- 
+        newPixelGroup cluster = regroupPixelsToColor (newColor cluster) (map (clusterAverage . getClusterPixels) clusters) pixels
+
 isKmeanDone :: Double -> [Cluster] -> [Cluster] -> Bool
 isKmeanDone _ [] [] = True
 isKmeanDone e (x:xs) (y:ys)
@@ -206,22 +206,14 @@ imageCompressor :: Int -> Double -> FilePath -> IO ()
 imageCompressor k e infile = do
     text <- fmap lines (readFile infile)
     let pixels = inputToPixels text
-    putStrLn "------"
-    let firstselec =  (defineKCentroids k pixels)
-    print firstselec
-    putStrLn "+++++++++++++"
-    let firstround = replaceCentroids pixels firstselec
-    print firstround
-    putStrLn "++++++++++++++"
-    let secondround = replaceCentroids pixels firstround
-    print secondround
-    putStrLn "------"
     doKmean pixels (defineKCentroids k pixels) (replaceCentroids pixels (defineKCentroids k pixels))
         where
             doKmean pixels cx cy
-                | isKmeanDone e cx cy = putStrLn (show cy)
+                | isKmeanDone e cx cy = print cy
                 | otherwise = doKmean pixels cy (replaceCentroids pixels cy)
-    -- mapM_ print (defineKCentroids k pixels)
+
+-- checkOptions :: [String] -> Bool
+-- checkOptions [] = True
 
 main :: IO ()
 main = do

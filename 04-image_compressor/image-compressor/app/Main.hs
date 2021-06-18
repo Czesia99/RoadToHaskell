@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 --
 -- EPITECH PROJECT, 2021
 -- Image Compressor
@@ -23,7 +22,7 @@ import System.Exit
 import System.IO
 import Control.Monad
 import Text.Printf
-import System.Random
+import Codec.Picture
 
 data Position = Position Int Int
 
@@ -72,25 +71,25 @@ instance Read Color where
             takeRest :: String -> String
             takeRest = tail . dropWhile (/= ')')
 
-data Pixel = Pixel Position Color
+data Piksel = Piksel Position Color
 
-instance Show Pixel where
-    show (Pixel pos col) = show pos ++ " " ++ show col
+instance Show Piksel where
+    show (Piksel pos col) = show pos ++ " " ++ show col
 
-instance Eq Pixel where
-    (Pixel pos1 col1) == (Pixel pos2 col2) = pos1 == pos2 && col1 == col2
+instance Eq Piksel where
+    (Piksel pos1 col1) == (Piksel pos2 col2) = pos1 == pos2 && col1 == col2
 
-instance Num Pixel where
-    (Pixel pos1 col1) + (Pixel pos2 col2) = Pixel (pos1 + pos2) (col1 + col2)
-    (Pixel pos1 col1) - (Pixel pos2 col2) = Pixel (pos1 - pos2) (col1 - col2)
+instance Num Piksel where
+    (Piksel pos1 col1) + (Piksel pos2 col2) = Piksel (pos1 + pos2) (col1 + col2)
+    (Piksel pos1 col1) - (Piksel pos2 col2) = Piksel (pos1 - pos2) (col1 - col2)
 
-instance Read Pixel where
-    readsPrec _ input = [(Pixel pos col, rest2)]
+instance Read Piksel where
+    readsPrec _ input = [(Piksel pos col, rest2)]
         where
             [(pos, rest1)] = reads input :: [(Position, String)]
             [(col, rest2)] = reads rest1 :: [(Color, String)]
 
-data Cluster = Cluster Color [Pixel]
+data Cluster = Cluster Color [Piksel]
 
 instance Show Cluster where
     show (Cluster col pixels) = "--\n" ++ show col ++ "\n-\n" ++ intercalate "\n" (map show pixels)
@@ -106,17 +105,17 @@ getColorG (Color r g b) = g
 getColorB :: Color -> Double
 getColorB (Color r g b) = b
 
-getColor :: Pixel -> Color
-getColor (Pixel pos col) = col
+getColor :: Piksel -> Color
+getColor (Piksel pos col) = col
 
-setColor :: Pixel -> Color -> Pixel
-setColor (Pixel pos col) col' = Pixel pos col'
+setColor :: Piksel -> Color -> Piksel
+setColor (Piksel pos col) col' = Piksel pos col'
 
-getPosition :: Pixel -> Position
-getPosition (Pixel pos col) = pos
+getPosition :: Piksel -> Position
+getPosition (Piksel pos col) = pos
 
-setPosition :: Pixel -> Position -> Pixel
-setPosition (Pixel pos col) pos' = Pixel pos' col
+setPosition :: Piksel -> Position -> Piksel
+setPosition (Piksel pos col) pos' = Piksel pos' col
 
 getClusterColor :: Cluster -> Color
 getClusterColor (Cluster col pixels) = col
@@ -124,16 +123,16 @@ getClusterColor (Cluster col pixels) = col
 setClusterColor :: Cluster -> Color -> Cluster
 setClusterColor (Cluster col pixels) col' = Cluster col' pixels
 
-getClusterPixels :: Cluster -> [Pixel]
+getClusterPixels :: Cluster -> [Piksel]
 getClusterPixels (Cluster col pixels) = pixels
 
-setClusterPixels :: Cluster -> [Pixel] -> Cluster
+setClusterPixels :: Cluster -> [Piksel] -> Cluster
 setClusterPixels (Cluster col pixels) pixels' = Cluster col pixels'
 
-inputToPixel :: String -> Pixel
-inputToPixel input = read input :: Pixel
+inputToPixel :: String -> Piksel
+inputToPixel input = read input :: Piksel
 
-inputToPixels :: [String] -> [Pixel]
+inputToPixels :: [String] -> [Piksel]
 inputToPixels = map inputToPixel
 
 printUsage :: IO()
@@ -154,25 +153,31 @@ eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 +
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
+-- unusedPixels :: [Pixel] -> [Pixel] -> [Pixel]
+-- unusedPixels pixels usedPixels = sortPixels pixels usedPixels []
+--     where
+--         sortPixels (x:xs) (y:ys) unusedPixels = 
+
 type SelectedColors = [Color]
 
-defineKCentroids :: Int -> [Pixel] -> [Cluster]
+defineKCentroids :: Int -> [Piksel] -> [Cluster]
 defineKCentroids k pixels = createCluster selectedColors []
     where
         createCluster [] c = c
-        createCluster (x:xs) c = createCluster xs (Cluster x (regroupPixelsToColor x selectedColors pixels) : c)
+        createCluster (x:xs) c = createCluster xs (Cluster x (regroupPixels x) : c)
         selectedColors = selectColors k pixels
+        regroupPixels x = regroupPixelsToColor x selectedColors pixels
 
-regroupPixelsToColor :: Color -> SelectedColors -> [Pixel] -> [Pixel]
+regroupPixelsToColor :: Color -> SelectedColors -> [Piksel] -> [Piksel]
 regroupPixelsToColor col sc pixels = filter (isNearestPixelToColor col sc) pixels
 
-isNearestPixelToColor :: Color -> SelectedColors -> Pixel -> Bool
+isNearestPixelToColor :: Color -> SelectedColors -> Piksel -> Bool
 isNearestPixelToColor col [] pixel = True
 isNearestPixelToColor col (x:xs) pixel
     | eDistColor col (getColor pixel) <= eDistColor x (getColor pixel) = isNearestPixelToColor col xs pixel
     | otherwise = False
 
-selectColors :: Int -> [Pixel] -> [Color]
+selectColors :: Int -> [Piksel] -> [Color]
 selectColors n pixels = select n (map getColor pixels) []
     where
         select n (x:xs) selectedColors
@@ -187,14 +192,14 @@ isColorDifferent c (x:xs)
     | c == x = False
     | otherwise = isColorDifferent c xs
 
-clusterAverage :: [Pixel] -> Color
+clusterAverage :: [Piksel] -> Color
 clusterAverage pixels = Color averageR averageG averageB
     where
-        averageR = foldl (+) 0 (map getColorR (map getColor pixels)) / fromIntegral (length pixels)
-        averageG = foldl (+) 0 (map getColorG (map getColor pixels)) / fromIntegral (length pixels)
-        averageB = foldl (+) 0 (map getColorB (map getColor pixels)) / fromIntegral (length pixels)
+        averageR = sum (map (getColorR . getColor) pixels) / fromIntegral (length pixels)
+        averageG = sum (map (getColorG . getColor) pixels) / fromIntegral (length pixels)
+        averageB = sum (map (getColorB . getColor) pixels) / fromIntegral (length pixels)
 
-replaceCentroids :: [Pixel] -> [Cluster] -> [Cluster]
+replaceCentroids :: [Piksel] -> [Cluster] -> [Cluster]
 replaceCentroids pixels clusters  = newClusters clusters []
     where
         newClusters [] nc = reverse nc
@@ -211,6 +216,7 @@ isKmeanDone e (x:xs) (y:ys)
 imageCompressor :: Int -> Double -> FilePath -> IO ()
 imageCompressor k e infile = do
     text <- fmap lines (readFile infile)
+    -- img <- readImage infile
     let pixels = inputToPixels text
     doKmean pixels (defineKCentroids k pixels) (replaceCentroids pixels (defineKCentroids k pixels))
         where
@@ -224,4 +230,6 @@ imageCompressor k e infile = do
 main :: IO ()
 main = do
     args <- getArgs
-    if length args /= 3 then printUsage >> printErrAndReturn "wrong number of arguments" 84 else imageCompressor (read (head args) :: Int) (read (args!!1) :: Double) (args!!2)
+    if length args /= 3 
+        then printUsage >> printErrAndReturn "wrong number of arguments" 84 
+        else imageCompressor (read (head args) :: Int) (read (args!!1) :: Double) (args!!2)

@@ -142,6 +142,12 @@ printUsage = putStrLn "USAGE: ./imageCompressor n e IN\n\n\t\
 \e\tconvergence limit\n\t\
 \IN\tpath to the file containing the colors of the pixels"
 
+showClusters :: [Cluster] -> IO ()
+showClusters [] = return ()
+showClusters (x:xs) = do
+    print x
+    showClusters xs
+
 eDistColor :: Color -> Color -> Double
 eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2)
 
@@ -209,7 +215,7 @@ imageCompressor k e infile = do
     doKmean pixels (defineKCentroids k pixels) (replaceCentroids pixels (defineKCentroids k pixels))
         where
             doKmean pixels cx cy
-                | isKmeanDone e cx cy = print cy
+                | isKmeanDone e cx cy = showClusters cy
                 | otherwise = doKmean pixels cy (replaceCentroids pixels cy)
 
 -- checkOptions :: [String] -> Bool

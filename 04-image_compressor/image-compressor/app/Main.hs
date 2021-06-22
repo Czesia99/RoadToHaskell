@@ -23,6 +23,7 @@ import System.IO
 import Control.Monad
 import Text.Printf
 import Codec.Picture
+import Codec.Picture.Types
 
 data Position = Position Int Int
 
@@ -153,10 +154,15 @@ eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 +
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
 
--- unusedPixels :: [Pixel] -> [Pixel] -> [Pixel]
--- unusedPixels pixels usedPixels = sortPixels pixels usedPixels []
---     where
---         sortPixels (x:xs) (y:ys) unusedPixels = 
+-- isPixelUnused :: Piksel -> [Piksel] -> Bool
+-- isPixelUnused pixel [] = True
+-- isPixelUnused pixel (x:xs)
+--     | pixel == x = False
+--     | otherwise = isPixelUsed pixel xs
+
+-- regroupPixelsToColor :: Color -> SelectedColors -> [Piksel] -> [Piksel] -> [Piksel]
+-- regroupPixelsToColor col sc pixels usedPixels = filter isPixelUnused regroupPixels
+--     where regroupPixels = filter (isNearestPixelToColor col sc) pixels
 
 type SelectedColors = [Color]
 
@@ -213,10 +219,33 @@ isKmeanDone e (x:xs) (y:ys)
     | eDistColor (getClusterColor x) (getClusterColor y) > e = False
     | otherwise = isKmeanDone e xs ys
 
+checkOptionsValues :: [String] -> Bool
+checkOptionsValues [k,e,_]
+    | isNothing (readInt k) = False
+    | isNothing (readDouble e) = False
+    | otherwise = True
+
+-- checkOptionsValues [k,e,_,g]
+--     | isNothing (readInt k) = False
+--     | isNothing (readDouble e) = False
+--     | g /= "--graphics" && g/= "-g" = False
+--     | otherwise = True
+
+checkOptions :: [String] -> Bool
+checkOptions args
+    | length args == 3 = checkOptionsValues args
+    | otherwise = False
+    -- | length args == 3 || length args == 4 = checkOptionsValues args
+
+readInt :: String -> Maybe Int
+readInt = readMaybe
+
+readDouble :: String -> Maybe Double
+readDouble = readMaybe
+
 imageCompressor :: Int -> Double -> FilePath -> IO ()
 imageCompressor k e infile = do
     text <- fmap lines (readFile infile)
-    -- img <- readImage infile
     let pixels = inputToPixels text
     doKmean pixels (defineKCentroids k pixels) (replaceCentroids pixels (defineKCentroids k pixels))
         where
@@ -224,12 +253,17 @@ imageCompressor k e infile = do
                 | isKmeanDone e cx cy = showClusters cy
                 | otherwise = doKmean pixels cy (replaceCentroids pixels cy)
 
--- checkOptions :: [String] -> Bool
--- checkOptions [] = True
+-- imageCompressorGraphics :: Int -> Double -> FilePath -> IO ()
+-- imageCompressorGraphics k e infile = do
+--     img <- readImage infile
+--     case img of
+--         Left _ -> putStrLn $ "not a supported codec for " ++ infile
+--         Right dynimg -> do
+--             putStrLn "image loaded"
 
 main :: IO ()
 main = do
     args <- getArgs
-    if length args /= 3 
-        then printUsage >> printErrAndReturn "wrong number of arguments" 84 
-        else imageCompressor (read (head args) :: Int) (read (args!!1) :: Double) (args!!2)
+    case args of
+        [] -> printUsage
+        a -> if checkOptions args then imageCompressor (read (head args) :: Int) (read (args!!1) :: Double) (args!!2) else printUsage >> printErrAndReturn "wrong number of arguments" 84

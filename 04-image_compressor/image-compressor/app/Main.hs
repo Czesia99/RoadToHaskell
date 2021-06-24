@@ -23,7 +23,6 @@ import System.IO
 import Control.Monad
 import Text.Printf
 import Codec.Picture
-import Codec.Picture.Types
 
 data Position = Position Int Int
 
@@ -225,17 +224,16 @@ checkOptionsValues [k,e,_]
     | isNothing (readDouble e) = False
     | otherwise = True
 
--- checkOptionsValues [k,e,_,g]
---     | isNothing (readInt k) = False
---     | isNothing (readDouble e) = False
---     | g /= "--graphics" && g/= "-g" = False
---     | otherwise = True
+checkOptionsValues [k,e,_,g]
+    | isNothing (readInt k) = False
+    | isNothing (readDouble e) = False
+    | g /= "--graphics" && g/= "-g" = False
+    | otherwise = True
 
 checkOptions :: [String] -> Bool
 checkOptions args
-    | length args == 3 = checkOptionsValues args
+    | length args == 3 || length args == 4 = checkOptionsValues args
     | otherwise = False
-    -- | length args == 3 || length args == 4 = checkOptionsValues args
 
 readInt :: String -> Maybe Int
 readInt = readMaybe
@@ -253,17 +251,20 @@ imageCompressor k e infile = do
                 | isKmeanDone e cx cy = showClusters cy
                 | otherwise = doKmean pixels cy (replaceCentroids pixels cy)
 
--- imageCompressorGraphics :: Int -> Double -> FilePath -> IO ()
--- imageCompressorGraphics k e infile = do
---     img <- readImage infile
---     case img of
---         Left _ -> putStrLn $ "not a supported codec for " ++ infile
---         Right dynimg -> do
---             putStrLn "image loaded"
+imageCompressorGraphics :: Int -> Double -> FilePath -> IO ()
+imageCompressorGraphics k e infile = do
+    img <- readImage infile
+    case img of
+        Left _ -> putStrLn $ "not a supported codec for " ++ infile
+        Right dynimg -> do
+            putStrLn "image loaded"
 
 main :: IO ()
 main = do
     args <- getArgs
     case args of
         [] -> printUsage
-        a -> if checkOptions args then imageCompressor (read (head args) :: Int) (read (args!!1) :: Double) (args!!2) else printUsage >> printErrAndReturn "wrong number of arguments" 84
+        [k,e,fp] -> if checkOptions args then imageCompressor (read k :: Int) (read e :: Double) fp else err
+        [k,e,fp,g] -> if checkOptions args then imageCompressorGraphics (read k :: Int) (read e :: Double) fp else err
+        where 
+            err = printUsage >> printErrAndReturn "wrong arguments" 84

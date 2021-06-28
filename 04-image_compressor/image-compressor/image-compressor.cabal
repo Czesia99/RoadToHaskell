@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7f72493a2462d2ed343f1545c0bccea6dcb3097334c923c03316f17bda89e057
+-- hash: b1eeb412bbb602541b88baa885982bbb5203f6389ad9298d3240ead7023338ed
 
 name:           image-compressor
 version:        0.1.0.0
@@ -27,13 +27,16 @@ source-repository head
 
 library
   exposed-modules:
+      Kmean
       Lib
+      Piksel
   other-modules:
       Paths_image_compressor
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels
+    , base >=4.7 && <5
   default-language: Haskell2010
 
 executable image-compressor-exe

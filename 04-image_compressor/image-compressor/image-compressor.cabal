@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b1eeb412bbb602541b88baa885982bbb5203f6389ad9298d3240ead7023338ed
+-- hash: 0bb4efa7771c9a7cd27f7624b76f5124f00ba5c6a4b3d77c7fdf348bf72962fb
 
 name:           image-compressor
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Graphics
       Kmean
       Lib
       Piksel

@@ -9,6 +9,7 @@ module Main where
 
 import Lib
 import Kmean
+import Graphics
 import System.Environment
 
 main :: IO ()

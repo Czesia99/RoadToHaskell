@@ -1,11 +1,9 @@
 module Kmean
     ( Cluster
-    , kmeanGraphics
     , kmean
     ) where
 
 import Data.List
-import Codec.Picture
 import Piksel
 
 data Cluster = Cluster Color [Piksel]
@@ -64,28 +62,20 @@ isKmeanDone e (x:xs) (y:ys)
     | otherwise = isKmeanDone e xs ys
 
 replaceCentroids :: [Piksel] -> [Cluster] -> [Cluster]
-replaceCentroids pixels clusters  = newClusters clusters []
+replaceCentroids pixels clusters  = newClusters clusters [] []
     where
-        newClusters [] nc = reverse nc
-        newClusters (x:xs) nc = newClusters xs (Cluster (newColor x) (newPixelGroup x) : nc)
+        newClusters [] _ nc = reverse nc
+        newClusters (x:xs) usedPixels nc = newClusters xs (newPixelGroup x usedPixels ++ usedPixels) (Cluster (newColor x) (newPixelGroup x usedPixels) : nc)
         newColor cluster = colorAverage (getClusterPixels cluster)
-        newPixelGroup cluster = regroupPixelsToColor (newColor cluster) (map (colorAverage . getClusterPixels) clusters) pixels
+        newPixelGroup cluster usedPixels = regroupPixelsToColor (newColor cluster) (map (colorAverage . getClusterPixels) clusters) (groupUnusedPixels pixels usedPixels)
 
 defineKCentroids :: Int -> [Piksel] -> [Cluster]
-defineKCentroids k pixels = createCluster selectedColors []
+defineKCentroids k pixels = createCluster selectedColors [] []
     where
-        createCluster [] c = c
-        createCluster (x:xs) c = createCluster xs (Cluster x (regroupPixels x) : c)
+        createCluster [] _ c = c
+        createCluster (x:xs) usedPixels c = createCluster xs (regroupPixels x usedPixels ++ usedPixels) (Cluster x (regroupPixels x usedPixels) : c)
         selectedColors = selectColors k pixels
-        regroupPixels x = regroupPixelsToColor x selectedColors pixels
-
-kmeanGraphics :: Int -> Double -> FilePath -> IO ()
-kmeanGraphics k e infile = do
-    img <- readImage infile
-    case img of
-        Left _ -> putStrLn $ "not a supported codec for " ++ infile
-        Right dynimg -> do
-            putStrLn "image loaded"
+        regroupPixels x usedPixels = regroupPixelsToColor x selectedColors (groupUnusedPixels pixels usedPixels)
 
 kmean :: Int -> Double -> FilePath -> IO ()
 kmean k e infile = do
@@ -96,13 +86,3 @@ kmean k e infile = do
             doKmean pixels cx cy
                 | isKmeanDone e cx cy = showClusters cy
                 | otherwise = doKmean pixels cy (replaceCentroids pixels cy)
-
--- isPixelUnused :: Piksel -> [Piksel] -> Bool
--- isPixelUnused pixel [] = True
--- isPixelUnused pixel (x:xs)
---     | pixel == x = False
---     | otherwise = isPixelUsed pixel xs
-
--- regroupPixelsToColor :: Color -> SelectedColors -> [Piksel] -> [Piksel] -> [Piksel]
--- regroupPixelsToColor col sc pixels usedPixels = filter isPixelUnused regroupPixels
---     where regroupPixels = filter (isNearestPixelToColor col sc) pixels

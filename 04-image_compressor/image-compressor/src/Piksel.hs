@@ -11,6 +11,7 @@ module Piksel
     , setPosition
     , addPosition
     , eDistColor
+    , groupUnusedPixels
     , colorAverage
     , inputToPixels
     ) where
@@ -82,6 +83,8 @@ instance Read Piksel where
             [(pos, rest1)] = reads input :: [(Position, String)]
             [(col, rest2)] = reads rest1 :: [(Color, String)]
 
+type UsedPixels = [Piksel]
+
 getColorR :: Color -> Double
 getColorR (Color r g b) = r
 
@@ -114,6 +117,15 @@ inputToPixel input = read input :: Piksel
 
 inputToPixels :: [String] -> [Piksel]
 inputToPixels = map inputToPixel
+
+isPixelUnused :: UsedPixels -> Piksel -> Bool
+isPixelUnused [] pixel = True
+isPixelUnused (x:xs) pixel
+    | pixel == x = False
+    | otherwise = isPixelUnused xs pixel
+
+groupUnusedPixels :: [Piksel] -> UsedPixels -> [Piksel]
+groupUnusedPixels pixels usedPixels = filter (isPixelUnused usedPixels) pixels
 
 colorAverage :: [Piksel] -> Color
 colorAverage pixels = Color averageR averageG averageB

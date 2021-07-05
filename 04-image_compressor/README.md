@@ -61,10 +61,10 @@ Compressed file:
 Original image:
 
 <p align="center">
-<img src=https://https://github.com/CzesiaLa/RoadToHaskell/tree/main/04-image_compressor/examples/ds.jpg alt="original"><br/>
+<img src=https://github.com/CzesiaLa/RoadToHaskell/tree/main/04-image_compressor/examples/ds.jpg alt="original"><br/>
 
 K = 2
 
 <p align="center">
-<img src=https://https://github.com/CzesiaLa/RoadToHaskell/tree/main/04-image_compressor/examples/dscomp.png alt="compressed"><br/>
+<img src=https://github.com/CzesiaLa/RoadToHaskell/tree/main/04-image_compressor/examples/dscomp.png alt="compressed"><br/>
 

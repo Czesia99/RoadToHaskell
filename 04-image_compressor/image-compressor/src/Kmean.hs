@@ -49,6 +49,7 @@ selectColors n pixels = select n (map getColor pixels) []
 isNearestPixelToColor :: Color -> SelectedColors -> Piksel -> Bool
 isNearestPixelToColor col [] pixel = True
 isNearestPixelToColor col (x:xs) pixel
+    | col == x = isNearestPixelToColor col xs pixel
     | eDistColor col (getColor pixel) <= eDistColor x (getColor pixel) = isNearestPixelToColor col xs pixel
     | otherwise = False
 

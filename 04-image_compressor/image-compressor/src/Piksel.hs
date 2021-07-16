@@ -10,6 +10,7 @@ module Piksel
     , getPosition
     , setPosition
     , addPosition
+    , distColor
     , eDistColor
     , groupUnusedPixels
     , colorAverage
@@ -108,6 +109,9 @@ setPosition (Piksel pos col) pos' = Piksel pos' col
 
 addPosition :: Position -> Position -> Position
 addPosition p1 p2 = p1 + p2
+
+distColor :: Color -> Color -> Double
+distColor (Color r1 g1 b1) (Color r2 g2 b2) = (r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2
 
 eDistColor :: Color -> Color -> Double
 eDistColor (Color r1 g1 b1) (Color r2 g2 b2) = sqrt ((r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2)

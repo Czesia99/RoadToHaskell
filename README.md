@@ -16,3 +16,5 @@
     - 1D Wolfram's Cellular Automaton
 - [Image Compressor](./04-image_compressor)
     - k-means clustering algorithm
+- [Eval Expr](./05-funEvalExpr)
+    - Functional calculator

@@ -10,3 +10,5 @@ https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 monads:
 https://wiki.haskell.org/All_About_Monads
 https://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html#monads
+https://www.youtube.com/watch?v=t1e8gqXLbsU
+https://www.youtube.com/watch?v=dDtZLm7HIJs

@@ -2,7 +2,7 @@
 <h1 align="center">Haskell introduction projects</h1>
 <br/><br/>
 <p align="center">
-<img src="http://cdn.usefulstuff.io/2016/03/haskell-logo.jpg" width="300">
+<img src="https://fr.wikipedia.org/wiki/Haskell#/media/Fichier:Haskell-Logo.svg" width="300">
 </p>
 
 ## Content

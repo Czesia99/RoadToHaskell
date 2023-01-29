@@ -1,9 +1,9 @@
-# Road To Haskell
-<h1 align="center">Haskell introduction projects</h1>
+<h1 align="center">Road To Haskell</h1>
 <br/><br/>
 <p align="center">
 <img src="documentation/haskell.png" height="300">
 </p>
+@henfur
 
 ## Content
 - [Day01](./01-day1)

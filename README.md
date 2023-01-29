@@ -1,9 +1,8 @@
 <h1 align="center">Road To Haskell</h1>
-<br/><br/>
 <p align="center">
 <img src="documentation/haskell.png" height="300">
 </p>
-@henfur
+art made by: @henfur
 
 ## Content
 - [Day01](./01-day1)

@@ -2,7 +2,7 @@
 <h1 align="center">Haskell introduction projects</h1>
 <br/><br/>
 <p align="center">
-<img src="documentation/haskell.png">
+<img src="documentation/haskell.png" height="300">
 </p>
 
 ## Content
